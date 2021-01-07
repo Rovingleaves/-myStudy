@@ -1,10 +1,11 @@
 import os
+from decimal import Decimal
 from flask import Flask, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, DecimalField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -67,7 +68,7 @@ def send_email(to, subject, template, **kwargs):
     thr.start()
     return thr
 
-@app.route('/', methods=['GET','POST'])
+@app.route('/hello', methods=['GET','POST'])
 def index():
     form = NameForm()
     if form.validate_on_submit():
@@ -75,7 +76,7 @@ def index():
         if user is None:
             user = User(username=form.name.data)
             db.session.add(user)
-            #db.session.commit()
+            db.session.commit()
             session['known']=False
             if app.config['OPPYUBB_ADMIN']:
                 send_email(app.config['OPPYUBB_ADMIN'],'New User','mail/new_user',user=user)
@@ -84,11 +85,34 @@ def index():
         session['name']=form.name.data
         form.name.data = ''
         return redirect(url_for('index'))
-    return render_template('index.html',
+    return render_template('hello.html',
                            name = session.get('name'),
                            form = form,
                            known=session.get('known',False),
                            current_time=datetime.utcnow())
+
+@app.route('/tools', methods=['GET'])
+def tools_list():
+    return render_template('tools.html')
+
+class CVCForm(FlaskForm):
+    height = DecimalField('Height (cm)', validators = [DataRequired()])
+    width = DecimalField('Width (cm)', validators = [DataRequired()])
+    depth = DecimalField('Depth (cm)', validators = [DataRequired()])
+    submit = SubmitField('Submit')
+
+@app.route('/tools/Carton_Volume_Calculator', methods=['GET','POST'])
+def CVC():
+    form = CVCForm()
+    result = 0
+    if form.validate_on_submit():
+        height = form.height.data
+        width = form.width.data
+        depth = form.depth.data
+        result = Decimal((height*width*depth)/Decimal(28316.85)).quantize(Decimal('0.00'))
+    return render_template('Carton_Volumn_Calculator.html',
+                           form = form,
+                           result = result)
 
 @app.shell_context_processor
 def make_shell_context():
