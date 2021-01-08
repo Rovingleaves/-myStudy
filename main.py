@@ -97,9 +97,9 @@ def tools_list():
     return render_template('tools.html')
 
 class CVCForm(FlaskForm):
-    height = DecimalField('Height (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=0, max=1000)])
-    width = DecimalField('Width (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=0, max=1000)])
-    depth = DecimalField('Depth (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=0, max=1000)])
+    height = DecimalField('Height (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=1000)])
+    width = DecimalField('Width (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=1000)])
+    depth = DecimalField('Depth (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=1000)])
     submit = SubmitField('Submit')
 
 @app.route('/tools/Carton_Volume_Calculator', methods=['GET','POST'])
