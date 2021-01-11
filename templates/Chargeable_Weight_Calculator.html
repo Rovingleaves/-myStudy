@@ -6,6 +6,7 @@
     <h2>{% if charageable_weight_is_gross_weight %}The chargeable weight is <span style='color:blue'>Gross Weight {{gross_weight}}kg</span> while volume weight is {{volume_weight}}kg
         {% elif charageable_weight_is_gross_weight == False %}The chargeable weight is <span style='color:blue'>Volumn Weight {{volume_weight}}kg</span> while gross weight is {{gross_weight}}kg 
         {% else %}Please fill up the carton's height, width, depth, and gross weight.{% endif %}</h2>
+    <p>Volume weight = (height x weight x depth) / 5000</p>
 </div>
 {{ wtf.quick_form(form)}}
 <p></p>

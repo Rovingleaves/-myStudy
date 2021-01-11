@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block page_content %}
+<div class='page-header'>
+    <h1>CIF Calculator (Air Freight)</h1>
+    <h2>{% if result %}The total CIF shipping cost is NTD {{ result }}{% else %}Please fill up the form below.{% endif %}</h2>
+</div>
+{{ wtf.quick_form(form)}}
+<h2>{% if result %}The total CIF shipping cost is NTD {{ result }}{% else %}{% endif %}</h2>
+<p></p>
+{% endblock %}
