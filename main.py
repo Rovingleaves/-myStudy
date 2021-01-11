@@ -96,11 +96,11 @@ def index():
 def tools_list():
     return render_template('tools.html')
 
-class CVCForm(FlaskForm):
+class CVCForm(FlaskForm): #Carton Valume Calculator
     height = DecimalField('Height (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=1000)])
     width = DecimalField('Width (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=1000)])
     depth = DecimalField('Depth (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=1000)])
-    gross_weight = DecimalField('Gross Weight (kg)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=100)])
+    gross_weight = DecimalField('Gross Weight (kg)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100)])
     submit = SubmitField('Submit')
 
 @app.route('/tools/Carton_Volume_Calculator', methods=['GET','POST'])
@@ -140,6 +140,49 @@ def CWC():
                            gross_weight = gross_weight,
                            volume_weight = volume_weight,
                            charageable_weight_is_gross_weight = charageable_weight_is_gross_weight)
+
+class SCCForm(FlaskForm): #Shipping Cost Calculator
+    total_weight = DecimalField('Chareable Weight (KG)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=100000)])
+    local = DecimalField('Local Transportation Cost (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
+    shipping = DecimalField('Air Freight Cost per Kilogram (NTD)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=100000)])
+    BAF = DecimalField('BAF (Bunker Adjustment Factor) per Kilogram (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
+    war = DecimalField('War Insurance Tax per Kilogram (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
+    customs = DecimalField('Customs Clearance Fee (NTD)', default=600, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
+    CAS = DecimalField('CAS (Clearance Automatic Server) (NTD)', default=240, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
+    AMS = DecimalField('AMS (Automatic Manifest Server) (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
+    warehouse = DecimalField('Warehouse Rental Fee per Kilogram (NTD)', widget=NumberInput(step=0.01),validators = [NumberRange(min=1, max=100000)])
+    warehouse_exceed = DecimalField('+300 Warehouse Rental Fee per Kilogram (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
+    other = DecimalField('Other Cost (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
+    submit = SubmitField('Submit')
+
+@app.route('/tools/CIF_Calculator_Air', methods=['GET','POST'])
+def CCA():
+    form = SCCForm()
+    result = 0
+    rent = 0
+    if form.validate_on_submit():
+        total_weight = form.total_weight.data
+        local = form.local.data
+        shipping = form.shipping.data*total_weight
+        BAF = form.BAF.data*total_weight
+        war = form.war.data*total_weight
+        customs = form.customs.data
+        CAS = form.CAS.data
+        AMS = form.AMS.data
+        warehouse = form.warehouse.data
+        warehouse_exceed = form.warehouse_exceed.data
+        other = form.other.data
+        if total_weight < 300:
+            rent = total_weight*warehouse
+        else:
+            rent = (warehouse*300) + ((total_weight-300)*warehouse_exceed)
+
+        result = local + shipping + BAF + war + customs + CAS + AMS + rent +other
+        result = Decimal(result).quantize(Decimal('0.00'))
+        result = format(result, '0,.2f')
+    return render_template('CIF_Calculator_Air.html',
+                           form = form,
+                           result = result)
 
 @app.shell_context_processor
 def make_shell_context():
