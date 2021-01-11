@@ -100,11 +100,13 @@ class CVCForm(FlaskForm):
     height = DecimalField('Height (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=1000)])
     width = DecimalField('Width (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=1000)])
     depth = DecimalField('Depth (cm)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=1000)])
+    gross_weight = DecimalField('Gross Weight (kg)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=100)])
     submit = SubmitField('Submit')
 
 @app.route('/tools/Carton_Volume_Calculator', methods=['GET','POST'])
 def CVC():
     form = CVCForm()
+    del form.gross_weight
     result = 0
     if form.validate_on_submit():
         height = form.height.data
@@ -114,6 +116,30 @@ def CVC():
     return render_template('Carton_Volumn_Calculator.html',
                            form = form,
                            result = result)
+
+class CWCForm(CVCForm): 
+    pass
+@app.route('/tools/Chargeable_Weight_Calculator', methods=['GET','POST'])
+def CWC():
+    form = CWCForm()
+    gross_weight = 0
+    volume_weight = 0
+    charageable_weight_is_gross_weight = None
+    if form.validate_on_submit():
+        height = form.height.data
+        width = form.width.data
+        depth = form.depth.data
+        gross_weight = form.gross_weight.data
+        volume_weight = Decimal((height*width*depth)/5000).quantize(Decimal('0.00'))
+        if gross_weight > volume_weight or gross_weight == volume_weight:
+            charageable_weight_is_gross_weight = True
+        else:
+            charageable_weight_is_gross_weight = False
+    return render_template('Chargeable_Weight_Calculator.html',
+                           form = form,
+                           gross_weight = gross_weight,
+                           volume_weight = volume_weight,
+                           charageable_weight_is_gross_weight = charageable_weight_is_gross_weight)
 
 @app.shell_context_processor
 def make_shell_context():
