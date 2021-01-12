@@ -5,7 +5,7 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DecimalField
+from wtforms import StringField, SubmitField, DecimalField, IntegerField
 from wtforms.validators import DataRequired, NumberRange
 from wtforms.widgets.html5 import NumberInput
 from flask_sqlalchemy import SQLAlchemy
@@ -143,16 +143,16 @@ def CWC():
 
 class SCCForm(FlaskForm): #Shipping Cost Calculator
     total_weight = DecimalField('Chareable Weight (KG)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=100000)])
-    local = DecimalField('Local Transportation Cost (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
-    shipping = DecimalField('Air Freight Cost per Kilogram (NTD)', widget=NumberInput(step=0.01),validators = [DataRequired(),NumberRange(min=1, max=100000)])
-    BAF = DecimalField('BAF (Bunker Adjustment Factor) per Kilogram (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
-    war = DecimalField('War Insurance Tax per Kilogram (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
-    customs = DecimalField('Customs Clearance Fee (NTD)', default=600, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
-    CAS = DecimalField('CAS (Clearance Automatic Server) (NTD)', default=240, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
-    AMS = DecimalField('AMS (Automatic Manifest Server) (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
-    warehouse = DecimalField('Warehouse Rental Fee per Kilogram (NTD)', widget=NumberInput(step=0.01),validators = [NumberRange(min=1, max=100000)])
-    warehouse_exceed = DecimalField('+300 Warehouse Rental Fee per Kilogram (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
-    other = DecimalField('Other Cost (NTD)', default=0, widget=NumberInput(step=0.01),validators = [NumberRange(min=0, max=100000)])
+    local = IntegerField('Local Transportation Cost (NTD)', default=0,validators = [NumberRange(min=0, max=100000)])
+    shipping = DecimalField('Air Freight Cost per Kilogram (NTD)',validators = [DataRequired(),NumberRange(min=1, max=100000)])
+    BAF = IntegerField('BAF (Bunker Adjustment Factor) per Kilogram (NTD)', default=0,validators = [NumberRange(min=0, max=100000)])
+    war = IntegerField('War Insurance Tax per Kilogram (NTD)', default=0,validators = [NumberRange(min=0, max=100000)])
+    customs = IntegerField('Customs Clearance Fee (NTD)', default=600,validators = [NumberRange(min=0, max=100000)])
+    CAS = IntegerField('CAS (Clearance Automatic Server) (NTD)', default=240,validators = [NumberRange(min=0, max=100000)])
+    AMS = IntegerField('AMS (Automatic Manifest Server) (NTD)', default=0,validators = [NumberRange(min=0, max=100000)])
+    warehouse = IntegerField('Warehouse Rental Fee per Kilogram (NTD)',default=6, validators = [NumberRange(min=1, max=100000)])
+    warehouse_exceed = IntegerField('+300 Warehouse Rental Fee per Kilogram (NTD)', default=0,validators = [NumberRange(min=0, max=100000)])
+    other = IntegerField('Other Cost (NTD)', default=0,validators = [NumberRange(min=0, max=100000)])
     submit = SubmitField('Submit')
 
 @app.route('/tools/CIF_Calculator_Air', methods=['GET','POST'])
@@ -178,8 +178,8 @@ def CCA():
             rent = (warehouse*300) + ((total_weight-300)*warehouse_exceed)
 
         result = local + shipping + BAF + war + customs + CAS + AMS + rent +other
-        result = Decimal(result).quantize(Decimal('0.00'))
-        result = format(result, '0,.2f')
+        result = Decimal(result).quantize(Decimal('0'))
+        result = format(result, '0,.0f')
     return render_template('CIF_Calculator_Air.html',
                            form = form,
                            result = result)
