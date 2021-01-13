@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block page_content %}
+<div class='page-header'>
+    <h1>USD to NTD Central Exchange Rate</h1>
+    <h3>Today: {{today}}</h3>
+    <p>scraping at {{time}}</p>
+    <h3>The last business day: {{last}}</h3>
+    <p>on {{day}}</p>
+    <p></p>
+    <p>Reference: <a href='https://rate.bot.com.tw/xrt?Lang=zh-TW'>Bank of Taiwan</a></p>
+</div>
+{% endblock %}
+
