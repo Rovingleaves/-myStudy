@@ -1,4 +1,4 @@
-import os
+import os, info
 from decimal import Decimal
 from flask import Flask, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
@@ -13,6 +13,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_mail import Message
 from threading import Thread
+
 
 app = Flask(__name__)
 
@@ -183,6 +184,21 @@ def CCA():
     return render_template('CIF_Calculator_Air.html',
                            form = form,
                            result = result)
+
+@app.route('/tools/USD_to_NTD_Exchange_Rate',methods=['GET','POST'])
+def US_to_NTD_Exchange_Rate():
+    today_rate = info.today_USD_rate()
+    last_rate = info.last_day_USD_rate()
+    time = datetime.now()
+    time = time.strftime('%H:%M')
+    day = info.last_business_day()
+
+    return render_template('USD_to_NTD_Exchange_Rate.html',
+                           today = today_rate,
+                           last = last_rate,
+                           time = time,
+                           day = day)
+    
 
 @app.shell_context_processor
 def make_shell_context():
