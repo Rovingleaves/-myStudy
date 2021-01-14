@@ -59,9 +59,16 @@ def last_business_day():
     last = last.strip().split(' ')
     return last[1]
 
+def scraping_time():
+    page = requests.get('https://rate.bot.com.tw/xrt?Lang=zh-TW')
+    soup = BeautifulSoup(page.content, 'html.parser')
+    last = soup.find('p', class_='text-info').get_text()
+    last = last.strip().split(' ')
+    return last[1]
+
 if __name__ == "__main__":
     pass
-    #print(last_business_day())
+    print(scraping_time())
 
 
 

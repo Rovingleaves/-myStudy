@@ -189,8 +189,7 @@ def CCA():
 def US_to_NTD_Exchange_Rate():
     today_rate = info.today_USD_rate()
     last_rate = info.last_day_USD_rate()
-    time = datetime.now()
-    time = time.strftime('%H:%M')
+    time = info.scraping_time()
     day = info.last_business_day()
 
     return render_template('USD_to_NTD_Exchange_Rate.html',
