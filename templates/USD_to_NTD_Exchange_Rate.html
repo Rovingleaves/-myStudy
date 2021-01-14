@@ -3,9 +3,9 @@
 {% block page_content %}
 <div class='page-header'>
     <h1>USD to NTD Central Exchange Rate</h1>
-    <h3>Today: {{today}}</h3>
+    <h3>Today: {%if today > 0%}{{today}}{%else%}No data{%endif%}</h3>
     <p>scraping at {{time}}</p>
-    <h3>The last business day: {{last}}</h3>
+    <h3>The last business day: {%if last > 0%}{{last}}{%else%}No data{%endif%}</h3>
     <p>on {{day}}</p>
     <p></p>
     <p>Reference: <a href='https://rate.bot.com.tw/xrt?Lang=zh-TW'>Bank of Taiwan</a></p>
